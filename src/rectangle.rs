@@ -1,15 +1,6 @@
-use std::ops::{
-    Add,
-    Sub,
-    Mul,
-    Div,
-};
-
-use num::integer::Integer;
-use num_traits::{
-    float::Float,
-    Signed,
-};
+use std::ops::{Add, Sub, Mul, Div};
+use num::{Integer, Float, Signed, Zero, zero};
+use num_traits::NumOps;
 
 use crate::point::Point;
 use crate::size::Size;
@@ -61,14 +52,66 @@ impl<T> Rectangle<T> {
     }
 }
 
-impl<T: Signed> Rectangle<T> {
-    pub fn area(&self) -> T where T: Mul<Output = T> + Copy {
+impl<T> Rectangle<T>
+    where T: Copy + NumOps + PartialOrd
+{
+    pub fn contains_point(&self, point: Point<T>) -> bool {
+        (point.x >= self.x) &&
+        (point.y >= self.y) &&
+        (point.x < self.x + self.width) &&
+        (point.y < self.y + self.height)
+    }
+
+    pub fn contains_rectangle(&self, rectangle: Rectangle<T>) -> bool {
+        (rectangle.x >= self.x) &&
+        (rectangle.y >= self.y) &&
+        (rectangle.x + rectangle.width <= self.x + self.width) &&
+        (rectangle.y + rectangle.height <= self.y + self.height)
+    }
+}
+
+impl<T> Rectangle<T>
+    where T: Copy + NumOps + Ord + Zero
+{
+    pub fn intersection(&self, other: Rectangle<T>) -> Rectangle<T> {
+        let right = self.x + self.width;
+        let bottom = self.y + self.height;
+        let other_right = other.x + other.width;
+        let other_bottom = other.y + other.height;
+
+        if (
+            (other.x > right) ||
+            (other_right < self.x) ||
+            (other.y > bottom) ||
+            (other_bottom < self.y)
+        ) {
+            return Rectangle {
+                x: self.x,
+                y: self.y,
+                width: zero(),
+                height: zero(),
+            };
+        }
+
+        let x = std::cmp::max(self.x, other.x);
+        let y = std::cmp::max(self.y, other.y);
+        let width = std::cmp::min(right, other_right) - x;
+        let height = std::cmp::min(bottom, other_bottom) - y;
+
+        Rectangle { x, y, width, height }
+    }
+}
+
+impl<T> Rectangle<T>
+    where T: Copy + Mul<Output = T> + Signed
+{
+    pub fn area(&self) -> T {
         self.width * self.height
     }
 }
 
 impl<T: Float> Rectangle<T> {
-    pub fn floor(&self) -> Self where T: Float {
+    pub fn floor(&self) -> Self {
         Self {
             x: self.x.floor(),
             y: self.y.floor(),
@@ -117,7 +160,9 @@ impl<T: Mul<Output = T>> Mul for Rectangle<T> {
     }
 }
 
-impl<T: Div<Output = T> + PartialOrd<i32>> Div for Rectangle<T> {
+impl<T> Div for Rectangle<T>
+    where T: Div<Output = T> + PartialOrd<i32>
+{
     type Output = Self;
 
     fn div(self, other: Self) -> Self::Output {
@@ -154,4 +199,25 @@ fn test_area() {
     let r2 = Rectangle { x: 0.0, y: 0.0, width: 1.3, height: 3.4 };
     assert_eq!(r1.area(), 100);
     assert_eq!(r2.area(), 4.42);
+}
+
+#[test]
+fn test_intersection() {
+    let r1 = Rectangle { x: 0, y: 0, width: 10, height: 10 };
+    let r2 = Rectangle { x: 3, y: 3, width: 10, height: 10 };
+
+    assert_eq!(r1.intersection(r2), Rectangle {
+        x: 3,
+        y: 3,
+        width: 7,
+        height: 7,
+    });
+
+    let r3 = Rectangle { x: 11, y: 3, width: 10, height: 10 };
+    assert_eq!(r1.intersection(r3), Rectangle {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+    });
 }

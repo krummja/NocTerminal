@@ -1,12 +1,6 @@
-use std::ops::{
-    Add,
-    Sub,
-    Mul,
-    Div,
-};
+use std::ops::{Add, Sub, Mul, Div};
 
-use num::integer::Integer;
-use num_traits::float::Float;
+use num::{Integer, Float};
 
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -63,7 +57,9 @@ impl<T: Mul<Output = T>> Mul for Point<T> {
     }
 }
 
-impl<T: Div<Output = T> + PartialOrd<i32>> Div for Point<T> {
+impl<T> Div for Point<T>
+    where T: Div<Output = T> + PartialOrd<i32>
+{
     type Output = Self;
 
     fn div(self, other: Self) -> Self::Output {

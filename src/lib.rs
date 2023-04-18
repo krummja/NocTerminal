@@ -23,6 +23,8 @@ mod state;
 mod terminal;
 mod texture;
 mod vertex;
+mod shape;
+mod tileset;
 
 use state::State;
 

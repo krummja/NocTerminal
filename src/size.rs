@@ -29,7 +29,9 @@ impl<T> Size<T> {
     }
 }
 
-impl<T: Sub<Output = T> + Signed> Size<T> {
+impl<T> Size<T>
+    where T: Sub<Output = T> + Signed
+{
     pub fn from_points(first: Point<T>, second: Point<T>) -> Self {
         let width = num::abs(first.x - second.x);
         let height = num::abs(first.y - second.y);
@@ -85,7 +87,9 @@ impl<T: Mul<Output = T>> Mul for Size<T> {
     }
 }
 
-impl<T: Div<Output = T> + PartialOrd<i32>> Div for Size<T> {
+impl<T> Div for Size<T>
+    where T: Div<Output = T> + PartialOrd<i32>
+{
     type Output = Self;
 
     fn div(self, other: Self) -> Self::Output {

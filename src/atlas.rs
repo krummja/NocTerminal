@@ -1,4 +1,10 @@
+use crate::point::Point;
+use crate::size::Size;
+use crate::rectangle::Rectangle;
+use crate::tileset::Tileset;
+
 use bitmaps::Bitmap;
+// use std::ops::{Shl, Shr};
 
 
 const BITMAP_SIZE: usize = 16;
@@ -23,15 +29,29 @@ pub enum TileAlignment {
 }
 
 
-pub struct Tileset {
-
+pub struct TileInfo<'a> {
+    tileset: Tileset,
+    texture: AtlasTexture,
+    bitmap: &'a mut Bitmap<BITMAP_SIZE>,
+    useful_space: Rectangle<i32>,
+    total_space: Rectangle<i32>,
+    texture_coords: TexCoords,
+    offset: Point<i32>,
+    spacing: Size<i32>,
+    alignment: TileAlignment,
+    is_animated: bool,
 }
 
-pub struct AtlasTexture {
 
+pub struct AtlasTexture {
+    initial_size: Size<i32>,
 }
 
 impl AtlasTexture {
+    pub fn new(initial_size: Size<i32>) -> Self {
+        Self { initial_size }
+    }
+
     pub fn add(tile: &TileInfo) {
         todo!()
     }
@@ -65,10 +85,33 @@ impl AtlasTexture {
     }
 }
 
-pub struct TileInfo<'a> {
-    tileset: Tileset,
-    texture: AtlasTexture,
-    bitmap: &'a mut Bitmap<BITMAP_SIZE>,
-    texture_coords: TexCoords,
-    alignment: TileAlignment,
+
+pub struct Atlas {
+    textures: Vec<AtlasTexture>,
+}
+
+impl Atlas {
+    pub fn add(tile: &TileInfo) {
+        todo!()
+    }
+
+    pub fn remove(tile: &TileInfo) {
+        todo!()
+    }
+
+    pub fn defragment() {
+        todo!()
+    }
+
+    pub fn clean_up() {
+        todo!()
+    }
+
+    pub fn clear() {
+        todo!()
+    }
+
+    pub fn apply_texture_filter() {
+        todo!()
+    }
 }
